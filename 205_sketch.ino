@@ -38,7 +38,7 @@ const long interval = 1000*600;
 
 void setup() {
   Serial.begin(9600);
-  Serial.println('a');
+  Serial.println("Begin");
   //Set input pins
   pinMode(light, INPUT);
   pinMode(temp, INPUT); 
@@ -62,26 +62,31 @@ uint8_t buttons = lcd.readButtons();
 void loop() {
   
   if(stepper1.distanceToGo() == 0){
-    
+    Serial.println("Reading");
     readTemp();                                   //Read temperature and luminosity
     readLight();
     displayReadings();
     if(avgLight>2.5){                        //Choose how many steps the motor needs to go based on luminosity and temperature
+    Serial.println("MOve to 4096");
     stepper1.moveTo(4096);
-    
     }
-    if(avgLight<2.5){                         //Choose how many steps the motor needs to go based on luminosity and temperature
+    if(avgLight<2.5){ 
+    Serial.println("MOve to -4096");              //Choose how many steps the motor needs to go based on luminosity and temperature
     stepper1.moveTo(-4096);
      }
   }
+   Serial.println("Motor Running");
    stepper1.run();
    
  if(stepper1.distanceToGo() == 0){             //10 min interval between each reading
   while(millis()<deltatime){
+    Serial.println("User Control");
    if(stepper1.distanceToGo() == 0){
+    Serial.println("Controlling");
     userControl();
-    
       }
+    Serial.println("Motor Running"); 
+    stepper1.run();
     }
   }
   deltatime += interval;
@@ -96,13 +101,13 @@ void readTemp(){
    int   rawReadingTem = analogRead(Temp);
    float voltage = rawReadingTem * 5.0;
    voltage /= 1024.0; 
-   Serial.println(voltage);
    float temperatureC = (voltage - 0.5) * 100;
    float temperatureF = (temperatureC * 9.0 / 5.0) + 32.0;
    sumTemp += temperatureF;
  }
    avgTemp = sumTemp/100;
-   Serial.println(avgTemp);
+   Serial.print(avgTemp);
+   Serial.println(" Degree");
 }
 
 void readLight(){
@@ -113,13 +118,14 @@ void readLight(){
    int rawReadingLight = analogRead(Light);
    Light = rawReadingLight*10/1023 ; 
    sumLight += Light;
-   Serial.println('a');
  }
    avgLight = sumLight/1000;
-   Serial.println(avgLight);
+   Serial.print(avgLight);
+   Serial.println(" Units");
 }
 
 void displayReadings(){
+   Serial.println("Displaying");
    lcd.clear();
    lcd.setCursor(0,0);
    lcd.print("Temp is ");
@@ -150,6 +156,7 @@ void userControl(){
       lcd.setCursor(0, 0);
       lcd.setBacklight(TEAL);
       //Open Blinds
+      Serial.println("Blinds open");
       stepper1.moveTo(4096);
     }
 
@@ -160,6 +167,7 @@ void userControl(){
       lcd.setCursor(0, 0);
       lcd.setBacklight(GREEN);
       //Close Blinds
+      Serial.println("Blinds close");
       stepper1.moveTo(-4096);
       
     }
