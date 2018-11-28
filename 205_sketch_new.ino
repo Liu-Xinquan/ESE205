@@ -32,7 +32,7 @@ float Light;
 float sumLight;
 float avgLight;
 
-long deltatime = 1000*600;
+long deltatime = 0;
 const long interval = 1000*600;
 
 
@@ -61,7 +61,7 @@ uint8_t i=0;
 
 void loop() {
   
-  if(stepper1.distanceToGo() == 0){
+  if(stepper1.distanceToGo() == 0&&millis()>deltatime){
     Serial.println("Reading");
     readTemp();                                   //Read temperature and luminosity
     readLight();
@@ -74,25 +74,19 @@ void loop() {
     Serial.println("MOve to -4096");              //Choose how many steps the motor needs to go based on luminosity and temperature
     stepper1.moveTo(-4096);
      }
+     deltatime+=interval;
   }
+  if(stepper1.distanceToGo() != 0){
    Serial.println("Motor Running");
    stepper1.run();
-   
+   Serial.println(stepper1.distanceToGo());
+  }
  if(stepper1.distanceToGo() == 0){             //10 min interval between each reading
-  while(millis()<deltatime){
-    Serial.println("User Control");
-   if(stepper1.distanceToGo() == 0){
     Serial.println("Controlling");
     userControl();
-      }
-    Serial.println("Motor Running"); 
-    stepper1.run();
-    }
-  }
-  deltatime += interval;
+ }
+
 }
-
-
 void readTemp(){
    sumTemp = 0;
    avgTemp = 0;
