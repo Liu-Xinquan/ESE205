@@ -35,6 +35,8 @@ float avgLight;
 long deltatime = 0;
 const long interval = 1000*30;
 
+int control==1;         //Created to fix the flashing display problem
+
 
 void setup() {
   Serial.begin(9600);
@@ -77,6 +79,7 @@ void loop() {
     if(avgTemp<60){                                //Choose how many steps the motor needs to go based on ltemperature
         stepper1.moveTo(0);  
     }
+     control = 1;                                  //The display is on
      deltatime = millis()+interval;                 //10 min interval between each reading
   }
  
@@ -139,13 +142,15 @@ void userControl(){
   uint8_t buttons = lcd.readButtons();
   //User Interface Design
   
- if (!buttons) {   
-  //   lcd.clear();
+ if (!buttons&&control==1) {   
+       lcd.clear();
        lcd.setCursor(0,0);
        lcd.print("Control");
        lcd.setCursor(0, 1);
        lcd.print("Temp is ");
        lcd.print(avgTemp);
+       control = 0;                                 //So the clear function will only run once ===> no flashing
+ }
   if (buttons) {
     //Clear Display, set cursor to row 0 column 0 
     lcd.clear();
@@ -193,5 +198,6 @@ void userControl(){
       lcd.print("MODE ");
       lcd.setBacklight(VIOLET);
     }
+    control = 1;                                   //Turn on the display again
   }
 }
