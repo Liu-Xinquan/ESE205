@@ -140,7 +140,7 @@ void userControl(){
   //User Interface Design
   
  if (!buttons) {   
-       lcd.clear();
+  //   lcd.clear();
        lcd.setCursor(0,0);
        lcd.print("Control");
        lcd.setCursor(0, 1);
