@@ -62,30 +62,31 @@ uint8_t i=0;
 void loop() {
   
   if(stepper1.distanceToGo() == 0&&millis()>deltatime){
-    
     readTemp();                                   //Read temperature and luminosity
     readLight();
     displayReadings();
-    if(avgLight>2.5){                        //Choose how many steps the motor needs to go based on luminosity and temperature
-    
-    stepper1.moveTo(15000);
+    if(avgLight>2.5){                             //Choose how many steps the motor needs to go based on luminosity 
+        stepper1.moveTo(15000);
     }
     if(avgLight<2.5){ 
-                //Choose how many steps the motor needs to go based on luminosity and temperature
-    stepper1.moveTo(0);
-     }
-     deltatime = millis()+interval;
+        stepper1.moveTo(0);                                        
+      }
+    if(avgTemp>75){
+        stepper1.moveTo(15000);  
+    }
+    if(avgTemp<60){                                //Choose how many steps the motor needs to go based on ltemperature
+        stepper1.moveTo(0);  
+    }
+     deltatime = millis()+interval;                 //10 min interval between each reading
   }
  
   if(stepper1.distanceToGo() != 0){
 //   Serial.println("Motor Running");
-   stepper1.run();
+      stepper1.run();                            //Turn the motor
 //   Serial.println(stepper1.distanceToGo());
   }
  
- if(stepper1.distanceToGo() == 0){             //10 min interval between each reading
-    
-    
+ if(stepper1.distanceToGo() == 0){            
     userControl();
  }
 
@@ -96,23 +97,21 @@ void readTemp(){
  for(i=0;i<=100;i++){
    int   rawReadingTem = analogRead(A2);
    float voltage = rawReadingTem * 5.0;
-   voltage /= 1024.0; 
-  
+   voltage /= 1024.0;                                           //From the data sheet of TMP36
    float temperatureC = (voltage - 0.5) * 100;
    float temperatureF = (temperatureC * 9.0 / 5.0) +32.0;
    sumTemp += temperatureF;
  }
-   avgTemp = sumTemp/100;
+   avgTemp = sumTemp/100;                                       //Find average
    
 }
 
 void readLight(){
    sumLight = 0;
    avgLight = 0;
- for(i=0;i<=10;i++){
+ for(i=0;i<=100;i++){
    int rawReadingLight = analogRead(Light);
-   Light = rawReadingLight*10/1023 ; 
-  
+   Light = rawReadingLight*100/1023 ; 
    sumLight += Light;
  }
    avgLight = sumLight/10;
@@ -121,9 +120,8 @@ void readLight(){
 }
 
 void displayReadings(){
-   
    lcd.clear();
-   lcd.setCursor(0,0);
+   lcd.setCursor(0,0);          //Show the readings on the display
    lcd.print("Temp is ");
    lcd.print(avgTemp);
    lcd.setCursor(0, 1);
@@ -140,12 +138,14 @@ void userControl(){
   lcd.setCursor(0, 0);
   uint8_t buttons = lcd.readButtons();
   //User Interface Design
-   lcd.clear();
-   lcd.setCursor(0,0);
-   lcd.print("Control");
-   lcd.setCursor(0, 1);
-   lcd.print("Temp is ");
-   lcd.print(avgTemp);
+  
+ if (!buttons) {   
+       lcd.clear();
+       lcd.setCursor(0,0);
+       lcd.print("Control");
+       lcd.setCursor(0, 1);
+       lcd.print("Temp is ");
+       lcd.print(avgTemp);
   if (buttons) {
     //Clear Display, set cursor to row 0 column 0 
     lcd.clear();
@@ -179,8 +179,7 @@ void userControl(){
       stepper1.moveTo(stepper1.currentPosition()+5000*3);
       
     }
-    
-    if (buttons & BUTTON_LEFT) {
+      if (buttons & BUTTON_LEFT) {
       lcd.print("LIGHT SETTINGS ");
       lcd.setBacklight(GREEN);
     }
