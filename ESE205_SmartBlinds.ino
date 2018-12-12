@@ -87,15 +87,12 @@ void loop() {
   }
  
   if(stepper1.distanceToGo() != 0){
-//   Serial.println("Motor Running");
-      stepper1.run();                               //Turn the motor
-//   Serial.println(stepper1.distanceToGo());
+       stepper1.run();                               //Turn the motor
   }
  
  if(stepper1.distanceToGo() == 0){            
     userControl();
- }
-
+  }
 }
 void readTemp(){
    sumTemp = 0;
@@ -139,13 +136,11 @@ void displayReadings(){
 
 
 void userControl(){
-  
-   //Set Cursor to row 0 column 0 
+  //Set Cursor to row 0 column 0 
   lcd.setCursor(0, 0);
   uint8_t buttons = lcd.readButtons();
   //User Interface Design
-  
- if (!buttons&&control==1) {   
+  if (!buttons&&control==1) {   
        lcd.clear();
        lcd.setCursor(0,0);
        lcd.print("Control");
@@ -153,12 +148,11 @@ void userControl(){
        lcd.print("Temp is ");
        lcd.print(avgTemp);
        control = 0;                                 //So the clear function will only run once ===> no flashing
- }
+    }
   if (buttons) {
     //Clear Display, set cursor to row 0 column 0 
     lcd.clear();
     lcd.setCursor(0,0);
-    
     if (buttons & BUTTON_UP) {
       lcd.print("OPENING ");
       lcd.setCursor(0, 1);
@@ -167,9 +161,6 @@ void userControl(){
       lcd.setBacklight(TEAL);
       //Open Blinds
       Serial.println("Blinds open");
-//      delay(5000);
-//      lcd.setBacklight(0);
-//      lcd.noDisplay();
       stepper1.moveTo(stepper1.currentPosition()-5000*3);
     }
 
@@ -181,11 +172,7 @@ void userControl(){
       lcd.setBacklight(GREEN);
       //Close Blinds
       Serial.println("Blinds close");
-//      delay(5000);
-//      lcd.setBacklight(0);
-//      lcd.noDisplay();
       stepper1.moveTo(stepper1.currentPosition()+5000*3);
-      
     }
       if (buttons & BUTTON_LEFT) {
       lcd.print("LIGHT SETTINGS ");
